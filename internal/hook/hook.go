@@ -371,7 +371,13 @@ func GetParameter(s string, params interface{}) (interface{}, error) {
 				index, err := strconv.ParseUint(p[0], 10, 64)
 
 				if err != nil || paramsValueSliceLength <= int(index) {
-					return nil, &ParameterNodeError{s}
+					perr := &ParameterNodeError{s}
+					switch {
+					case err != nil:
+						return nil, fmt.Errorf("%w: %w", perr, err)
+					default:
+						return nil, perr
+					}
 				}
 
 				return GetParameter(p[1], params.([]interface{})[index])
